@@ -4,9 +4,9 @@ Tested with Python 3.8.6
 
 ## Requirements:
 
-- tesseract
-- ocrmypdf
-- ghostscript
+* tesseract
+* ocrmypdf
+* ghostscript
 
 ## Usage:
 
@@ -14,10 +14,12 @@ python3 pyOCR.py [inputFolder] [quality]
 
 ## Parameters:
 
-inputFolder:    Folder which contains the pdf files
-quality:        1 = GhostScript Quality "Screen" 72dpi
-                2 = GhostScript Quality "EBook" 150dpi
-                3 = GhostScript Quality "Printer" 300dpi
+* inputFolder:    
+  * Folder which contains the pdf files
+* quality:        
+  * 1 = GhostScript Quality "Screen" 72dpi
+  * 2 = GhostScript Quality "EBook" 150dpi
+  * 3 = GhostScript Quality "Printer" 300dpi
                 
 ## Exmaple:
 
