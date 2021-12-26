@@ -4,13 +4,13 @@ Tested with Python 3.8.6
 
 ## Requirements:
 
-* tesseract
-* ocrmypdf
+* tesseract + language of choice
+* ocrmypdf (maybe via pip)
 * ghostscript
 
 ## Usage:
 
-python3 pyOCR.py [inputFolder] [quality]
+python pyOCR.py [inputFolder] [quality] [outputFolder] [language]
 
 ## Parameters:
 
@@ -20,7 +20,8 @@ python3 pyOCR.py [inputFolder] [quality]
   * 1 = GhostScript Quality "Screen" 72dpi
   * 2 = GhostScript Quality "EBook" 150dpi
   * 3 = GhostScript Quality "Printer" 300dpi
+  * 4 = GhostScript Quality "Pre Press" 300dpi HQ
                 
 ## Exmaple:
 
-python3 pyOCR.py ~/tmp/ 2
+python pyOCR.py ~/tmp/ 2 ~/Documents/ deu+eng
