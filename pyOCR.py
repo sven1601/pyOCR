@@ -3,10 +3,9 @@ import os
 import sys
 
 inputDir = ""
+outputDir = ""
 pdfFileList = []
-ocrCommand = ["ocrmypdf", "-l", "deu+eng", "--output-type", "pdfa"]
 ocrCommand_tmp = []
-gsCommand = ["gs", "-sDEVICE=pdfwrite", "-dCompatibilityLevel=1.4", "-dNOPAUSE", "-dBATCH"]
 gsCommand_tmp = []
 quality = -1
 clear = lambda: os.system('clear')
@@ -18,13 +17,13 @@ def getPdfFiles(thisPath):
         if os.path.isfile(file) and file.endswith('.pdf') and file.find("_.pdf") < 0:
             pdfFileList.append(file)
             #print(file)
-    
+
     if len(pdfFileList) > 1:
         pdfFileList.sort()
 
 # ----------------------------------------------------------
 def printProgressBar(actualCount, totalCount):
-    totalLength = 150
+    totalLength = 70
     singleStepPercent = 100 / totalLength
     if actualCount > 0:
         actualPercent = (1 / (int(totalCount) / int(actualCount))) * 100
@@ -38,7 +37,7 @@ def printProgressBar(actualCount, totalCount):
             print('#', end='')
         else:
             print(' ', end='')
-        
+
 
     print('] ', end='')
     print('%.2f'%actualPercent + '% ' + '(Element %i '%actualCount + 'of %i)'%totalCount, end='\r')
@@ -46,22 +45,46 @@ def printProgressBar(actualCount, totalCount):
 # ----------------------------------------------------------
 def main():
 
-    if len(sys.argv) != 3 or (int(sys.argv[2]) < 1 or int(sys.argv[2]) > 3):
-        print('Usage: pyOCR.py [InputDir] [Quality]')
-        print('InutDir: Whole folder to convert')
-        print('Quality: 1 - 3 (72dpi, 150dpi, 300dpi)')
+    clear()
+
+    if len(sys.argv) != 5 or sys.argv[1] == "--help":
+        print('')
+        print('Usage: pyOCR.py [InputDir] [Quality] [OutputDir] [OcrmypdfLang]')
+        print('InutDir: Path that conatins PDF documents to convert')
+        print('Quality: 1 - 4 (72dpi, 150dpi, 300dpi, 300dpi hq)')
+        print('OutputDir: Target Output folder')
+        print('OcrmypdfLang: Language String, please refer to ocrmypdf arguments')
+        print('')
+        print('Example: python ./pyOCR.py ~/SourceFolder/ 2 ~/TargetFolder/ deu+eng')
+        print('Example: python ./pyOCR.py ~/SourceFolder/ 2 ~/TargetFolder/ eng')
+        print('')
         return
 
-    inputDir = sys.argv[1] 
-    #inputDir = '/home/sven/Temp'       # Debug Mode
+    inputDir = sys.argv[1]
     quality = int(sys.argv[2])
-    #quality = 2                        # Debug Mode
+    outputDir = sys.argv[3]
+    lang = sys.argv[4]
 
-    if os.path.isdir(inputDir) == False:
+    if quality < 1 or quality > 4:
+        print('Quality (Param 2) has not a valid value, please check params!!!')
+        return
+
+    if len(inputDir) == 0 or os.path.isdir(inputDir) == False:
         print('Input Dir (Param 1) doesn\'t exist, please check params!!!')
         return
 
-    getPdfFiles(inputDir)     
+    if len(outputDir) == 0 or os.path.isdir(outputDir) == False:
+        print('Output Dir (Param 3) doesn\'t exist, please check params!!!')
+        return
+
+    if len(lang) == 0:
+        print('Language (Param 4) not specified, please check params!!!')
+        return
+
+    ocrCommand = ["ocrmypdf", "-l", lang, "--output-type", "pdfa", "--jobs", "4"]
+    gsCommand = ["gs", "-sDEVICE=pdfwrite", "-dCompatibilityLevel=1.4", "-dNOPAUSE", "-dBATCH"]
+
+    getPdfFiles(inputDir)
 
     for file in pdfFileList:
         if "_out.pdf" in file:
@@ -69,10 +92,10 @@ def main():
             return
 
     items = int(len(pdfFileList))
-    counter = 0     
+    counter = 0
 
-    clear()   
-    printProgressBar(counter, items) 
+    clear()
+    printProgressBar(counter, items)
 
     for file in pdfFileList:
 
@@ -80,8 +103,8 @@ def main():
         filename, fileExt = os.path.splitext(filenameWithExt)
 
         outputFileTmp = os.path.join(inputDir, filename + "_temp.pdf")
-        outputFile = os.path.join(inputDir, filename + "_out.pdf")
-            
+        outputFile = os.path.join(outputDir, filename + ".pdf")
+
         ocrCommand_tmp = []
         ocrCommand_tmp = ocrCommand.copy()
         ocrCommand_tmp.append(file)
@@ -99,23 +122,26 @@ def main():
                 gsCommand_tmp.append('-dPDFSETTINGS=/ebook')
             if quality == 3:
                 gsCommand_tmp.append('-dPDFSETTINGS=/printer')
+            if quality == 4:
+                gsCommand_tmp.append('-dPDFSETTINGS=/prepress')
 
             gsCommand_tmp.append("-sOutputFile=" + outputFile)
-            gsCommand_tmp.append(outputFileTmp)       
+            gsCommand_tmp.append(outputFileTmp)
             result = subprocess.run(gsCommand_tmp, capture_output=True)     #Input File
 
             if result.returncode == 0:
                 counter += 1
                 printProgressBar(counter, items)
-                os.remove(outputFileTmp)                
+                os.remove(outputFileTmp)
             else:
-                print("Ghostscript Returncode: " + str(result) + "on file: " + filenameWithExt)
+                print(f"Ghostscript Returncode: {str(result)} on file: {filenameWithExt}")
                 return
         else:
-            print("OCRmyPDF Returncode: " + str(result) + "on file: " + filenameWithExt)
+            print(f"OCRmyPDF Returncode: {str(result)} on file: {filenameWithExt}")
             return
 
-    clear() 
+    clear()
+    print(f"{str(counter)} of {str(items)} Documents successfully converted")
 
 # ----------------------------------------------------------
-main()             
+main()
