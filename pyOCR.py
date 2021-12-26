@@ -1,12 +1,12 @@
 import subprocess
 import os
 import sys
+from shutil import copyfile
 
 inputDir = ""
 outputDir = ""
 pdfFileList = []
 ocrCommand_tmp = []
-gsCommand_tmp = []
 quality = -1
 clear = lambda: os.system('clear')
 
@@ -53,7 +53,7 @@ def main():
         print('-------------------------------------------------------------------------------------------------------')
         print('Parameters:')
         print('InutDir:     Path that conatins PDF documents to convert')
-        print('Quality:     1 - 4 (72dpi, 150dpi, 300dpi, 300dpi hq)')
+        print('Quality:     0 - 3 (Lossless, Try lossless, Medium compression, High compression)')
         print('OutputDir:   Target Output folder')
         print('Language:    String, that specifies the "3 digit letter code" for tesseract. Can be chained by \'+\'')
         print('-------------------------------------------------------------------------------------------------------')
@@ -67,7 +67,7 @@ def main():
     outputDir = sys.argv[3]
     lang = sys.argv[4]
 
-    if quality < 1 or quality > 4:
+    if quality < 0 or quality > 3:
         print('Quality (Param 2) has not a valid value, please check params!!!')
         return
 
@@ -83,8 +83,7 @@ def main():
         print('Language (Param 4) not specified, please check params!!!')
         return
 
-    ocrCommand = ["ocrmypdf", "-l", lang, "--output-type", "pdfa", "--jobs", "4"]
-    gsCommand = ["gs", "-sDEVICE=pdfwrite", "-dCompatibilityLevel=1.4", "-dNOPAUSE", "-dBATCH"]
+    ocrCommand = ["ocrmypdf", "-l", str(lang), "--output-type", "pdfa", "--jobs", "4", "--pdfa-image-compression", "lossless", "--optimize", str(quality), "--clean"]
 
     getPdfFiles(inputDir)
 
@@ -110,34 +109,13 @@ def main():
         ocrCommand_tmp = []
         ocrCommand_tmp = ocrCommand.copy()
         ocrCommand_tmp.append(file)
-        ocrCommand_tmp.append(outputFileTmp)
+        ocrCommand_tmp.append(outputFile)
 
         result = subprocess.run(ocrCommand_tmp, capture_output=True)
 
         if result.returncode == 0:
-            gsCommand_tmp = []
-            gsCommand_tmp = gsCommand.copy()
-
-            if quality == 1:
-                gsCommand_tmp.append('-dPDFSETTINGS=/screen')
-            if quality == 2:
-                gsCommand_tmp.append('-dPDFSETTINGS=/ebook')
-            if quality == 3:
-                gsCommand_tmp.append('-dPDFSETTINGS=/printer')
-            if quality == 4:
-                gsCommand_tmp.append('-dPDFSETTINGS=/prepress')
-
-            gsCommand_tmp.append("-sOutputFile=" + outputFile)
-            gsCommand_tmp.append(outputFileTmp)
-            result = subprocess.run(gsCommand_tmp, capture_output=True)     #Input File
-
-            if result.returncode == 0:
-                counter += 1
-                printProgressBar(counter, items)
-                os.remove(outputFileTmp)
-            else:
-                print(f"Ghostscript Returncode: {str(result)} on file: {filenameWithExt}")
-                return
+            counter += 1
+            printProgressBar(counter, items)
         else:
             print(f"OCRmyPDF Returncode: {str(result)} on file: {filenameWithExt}")
             return
