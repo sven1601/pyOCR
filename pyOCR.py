@@ -48,16 +48,18 @@ def main():
     clear()
 
     if len(sys.argv) != 5 or sys.argv[1] == "--help":
-        print('')
-        print('Usage: pyOCR.py [InputDir] [Quality] [OutputDir] [OcrmypdfLang]')
-        print('InutDir: Path that conatins PDF documents to convert')
-        print('Quality: 1 - 4 (72dpi, 150dpi, 300dpi, 300dpi hq)')
-        print('OutputDir: Target Output folder')
-        print('OcrmypdfLang: Language String, please refer to ocrmypdf arguments')
-        print('')
-        print('Example: python ./pyOCR.py ~/SourceFolder/ 2 ~/TargetFolder/ deu+eng')
-        print('Example: python ./pyOCR.py ~/SourceFolder/ 2 ~/TargetFolder/ eng')
-        print('')
+        print('-------------------------------------------------------------------------------------------------------')
+        print('Usage:       pyOCR.py [InputDir] [Quality] [OutputDir] [Language]')
+        print('-------------------------------------------------------------------------------------------------------')
+        print('Parameters:')
+        print('InutDir:     Path that conatins PDF documents to convert')
+        print('Quality:     1 - 4 (72dpi, 150dpi, 300dpi, 300dpi hq)')
+        print('OutputDir:   Target Output folder')
+        print('Language:    String, that specifies the "3 digit letter code" for tesseract. Can be chained by \'+\'')
+        print('-------------------------------------------------------------------------------------------------------')
+        print('Example:     python ./pyOCR.py ~/SourceFolder/ 2 ~/TargetFolder/ deu+eng')
+        print('             python ./pyOCR.py ~/SourceFolder/ 4 ~/TargetFolder/ eng')
+        print('-------------------------------------------------------------------------------------------------------')
         return
 
     inputDir = sys.argv[1]
