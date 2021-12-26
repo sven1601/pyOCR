@@ -4,9 +4,8 @@ Tested with Python 3.8.6
 
 ## Requirements:
 
-* tesseract + language of choice
+* tesseract + tesseract language of choice
 * ocrmypdf (maybe via pip)
-* ghostscript
 
 ## Usage:
 
