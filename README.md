@@ -17,11 +17,15 @@ python pyOCR.py [inputFolder] [quality] [outputFolder] [language]
 * inputFolder:    
   * Folder which contains the pdf files
 * quality:        
-  * 1 = GhostScript Quality "Screen" 72dpi
-  * 2 = GhostScript Quality "EBook" 150dpi
-  * 3 = GhostScript Quality "Printer" 300dpi
-  * 4 = GhostScript Quality "Pre Press" 300dpi HQ
+  * 0 = Lossless (Large file)
+  * 1 = Try lossless
+  * 2 = Medium compression
+  * 3 = High compression (best filesize)
+* outputFolder:
+  * Folder to save the output files
+* language
+  * String to specify the language for tesseract and ocrmypdf, can be chained with '+'  
                 
 ## Exmaple:
 
-python pyOCR.py ~/tmp/ 2 ~/Documents/ deu+eng
+python pyOCR.py ~/tmp/ 0 ~/Documents/ deu+eng
